@@ -10,6 +10,10 @@ app.get('/version', (req, res) => {
   res.send('1') // change this string when you update the version
 })
 
+app.get('/health', (req, res) => {
+  res.send('ok')
+})
+
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`server started on port ${PORT}`)

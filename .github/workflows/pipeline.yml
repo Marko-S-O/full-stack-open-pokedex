@@ -43,8 +43,23 @@ jobs:
           retention-days: 30
           
       # Production deployment
+      - name: print commits
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+        run: echo "$COMMITS"
+      - name: print commit messages
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+        run: echo "$COMMIT_MESSAGES"        
       - name: Deploy the app
-        if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits), '#skip') && !contains(toJson(github.event.commits), '#SKIP') && !contains(toJson(github.event.commits), '#Skip') }}
+        if: |
+          github.event_name == 'push' && 
+          !contains(toJson(github.event.commits), '#skip') && 
+          !contains(toJson(github.event.commits), '#SKIP') && 
+          !contains(toJson(github.event.commits), '#Skip') &&
+          !contains(toJson(github.event.commits.*.message), '#skip') && 
+          !contains(toJson(github.event.commits.*.message), '#SKIP') && 
+          !contains(toJson(github.event.commits.*.message), '#Skip') 
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -65,4 +80,3 @@ jobs:
         default_bump: 'minor'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

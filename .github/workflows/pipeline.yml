@@ -44,7 +44,8 @@ jobs:
           
       # Production deployment
       - name: Deploy the app
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') && !contains(join(github.event.commits.*.message, ' '), '#SKIP') && !contains(join(github.event.commits.*.message, ' '), '#Skip') }}
+
+        if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip') && !contains(toJson(github.event.commits.*.message), '#SKIP') && !contains(toJson(github.event.commits.*.message), '#Skip') }}
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -65,7 +65,3 @@ jobs:
         default_bump: 'minor'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-        
-          
-        

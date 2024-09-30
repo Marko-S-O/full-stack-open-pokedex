@@ -44,7 +44,6 @@ jobs:
           
       # Production deployment
       - name: Deploy the app
-
         if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip') && !contains(toJson(github.event.commits.*.message), '#SKIP') && !contains(toJson(github.event.commits.*.message), '#Skip') }}
         run: flyctl deploy --remote-only
         env:
@@ -52,7 +51,7 @@ jobs:
 
   tag_release:
     needs: [simple_deployment_pipeline]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(toJson(github.event.commits.*.message), '#skip') && !contains(toJson(github.event.commits.*.message), '#SKIP') && !contains(toJson(github.event.commits.*.message), '#Skip') }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code

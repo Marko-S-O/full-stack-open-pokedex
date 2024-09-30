@@ -71,7 +71,7 @@ jobs:
 
   tag_release:
     needs: [simple_deployment_pipeline]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(toJson(github.event.commits), '#skip') && !contains(toJson(github.event.commits), '#SKIP') && !contains(toJson(github.event.commits), '#Skip') }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the code

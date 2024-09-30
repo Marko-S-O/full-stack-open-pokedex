@@ -51,6 +51,10 @@ jobs:
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
         run: echo "$COMMIT_MESSAGES"        
+      - name: print comments
+        env:
+          COMMENTS: ${{ toJson(github.event.comment.body) }}
+        run: echo "$COMMENTS"           
       - name: Deploy the app
         if: |
           github.event_name == 'push' && 
@@ -59,7 +63,10 @@ jobs:
           !contains(toJson(github.event.commits), '#Skip') &&
           !contains(toJson(github.event.commits.*.message), '#skip') && 
           !contains(toJson(github.event.commits.*.message), '#SKIP') && 
-          !contains(toJson(github.event.commits.*.message), '#Skip') 
+          !contains(toJson(github.event.commits.*.message), '#Skip') &&
+          !contains(github.event.comment.body, '#skip') && 
+          !contains(github.event.comment.body, '#SKIP') && 
+          !contains(github.event.comment.body, '#Skip') 
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

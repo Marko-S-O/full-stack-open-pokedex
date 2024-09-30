@@ -44,7 +44,7 @@ jobs:
           
       # Production deployment
       - name: Deploy the app
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && !contains(lower(join(github.event.commits.*.message, ' ')), '#skip') }}
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -65,3 +65,20 @@ jobs:
         default_bump: 'minor'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  print_commits:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: actions/checkout@v4
+    - name: github context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+    - name: commits
+      env:
+        COMMITS: ${{ toJson(github.event.commits) }}
+      run: echo "$COMMITS"
+    - name: commit messages
+      env:
+        COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+      run: echo "$COMMIT_MESSAGES"

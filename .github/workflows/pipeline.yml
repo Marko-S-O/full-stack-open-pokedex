@@ -60,9 +60,6 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      - name: Fail test
-        run: exit 1
-
         # Discord hooks for failure notifications
       - name: The build has failed
         uses: stegzilla/discord-notify@v2
@@ -71,7 +68,7 @@ jobs:
           title: Build failed
           message: |
             Build failed
-            [Link to GitHub action](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            [Link to GitHub action](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
             Commit URL: ${{ github.event.head_commit.url || 'N/A' }}
           webhook_url: ${{ secrets.DISCORD_WEBHOOK }}        
 

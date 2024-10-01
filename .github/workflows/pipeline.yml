@@ -21,20 +21,26 @@ jobs:
       # Build the app
       - name: Install dependencies        
         run: npm ci
+        id: Install_dependencies
       - name: Check style        
         run: npm run eslint
+        id: Check_style
       - name: Build
         run: npm run build
+        id: Build
 
       # Run unit tests
-      - name: Test
+      - name: Unit tests
         run: npm run test
+        id: Unit_tests
 
       # Run e2e tests
-      - name: Install Playwright Browsers
+      - name: Install Playwright browsers
         run: npx playwright install --with-deps
-      - name: Run Playwright tests
+        id: Install_Playwright_browsers
+      - name: Run E2E tests
         run: npm run test:e2e
+        id: Run_e2e_tests
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -42,24 +48,9 @@ jobs:
           path: playwright-report/
           retention-days: 30
           
-      # Production deployment
-      - name: print commits
-        env:
-          COMMITS: ${{ toJson(github.event.commits) }}
-        run: echo "$COMMITS"
-      - name: print commit messages
-        env:
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-        run: echo "$COMMIT_MESSAGES"        
-      - name: print comments
-        env:
-          COMMENTS: ${{ toJson(github.event.comment.body) }}
-        run: echo "$COMMENTS"      
-      - name: print event
-        env:
-          EVENT: ${{ toJson(github.event) }}
-        run: echo "$EVENT"               
+      # Production deployment             
       - name: Deploy the app
+        id: Deploy_the_app
         if: |
           github.event_name == 'push' && 
           !contains(join(github.event.commits.*.message, ' '), '#skip') && 
@@ -69,7 +60,21 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
+      # Discord hooks for failure notifications
+      - name: The build has failed
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ failure() }}
+        with:
+          severity: error
+          details: | 
+            Build failed
+            [Details](${{ github.server_url }}/{{ github.repository }}/actions/runs/${{ github.run_id }}).      
+            Pull Request: ${{ github.event.pull_request.html_url || 'N/A' }}
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}          
+        
+
   tag_release:
+    # Check out the code and bump the version tag
     needs: [simple_deployment_pipeline]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
@@ -85,3 +90,15 @@ jobs:
         default_bump: 'minor'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Discord hooks for success notifications - get the new tag into the message
+    - name: The build has succeeded
+      uses: rjstone/discord-webhook-notify@v1
+      if: ${{ success() }}
+      with:
+        severity: info
+        details: |
+          Build succesful.
+          Pull Request: ${{ github.event.pull_request.html_url || 'N/A' }}
+          Version Tag: ${{ github.ref_name }}          
+        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

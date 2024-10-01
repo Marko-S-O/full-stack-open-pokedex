@@ -93,9 +93,12 @@ jobs:
     
     # Discord hooks for success notifications - get the new tag into the message
     - name: The build has succeeded
-      uses: rjstone/discord-webhook-notify@v1
+      uses: stegzilla/discord-notify@v2
       if: ${{ success() }}
       with:
-        severity: info
-        details: Build succesful.
-        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        title: Build succesful
+        message: |
+          Build succesful.
+          Pull Request: ${{ github.event.pull_request.html_url || 'N/A' }}
+          Version Tag: ${{ github.ref_name }}   
+        webhook_url: ${{ secrets.DISCORD_WEBHOOK }}

@@ -71,7 +71,7 @@ jobs:
           title: Build failed
           message: |
             Build failed
-            [Details](${{ github.server_url }}/{{ github.repository }}/actions/runs/${{ github.run_id }}). 
+            [Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
             Commit URL: ${{ github.event.head_commit.url }}
           webhook_url: ${{ secrets.DISCORD_WEBHOOK }}        
 

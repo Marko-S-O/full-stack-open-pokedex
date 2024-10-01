@@ -60,18 +60,20 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      # Discord hooks for failure notifications
+      - name: Fail test
+        run: exit 1
+
+        # Discord hooks for failure notifications
       - name: The build has failed
-        uses: rjstone/discord-webhook-notify@v1
+        uses: stegzilla/discord-notify@v2
         if: ${{ failure() }}
         with:
-          severity: error
-          details: | 
+          title: Build failed
+          message: |
             Build failed
-            [Details](${{ github.server_url }}/{{ github.repository }}/actions/runs/${{ github.run_id }}).      
-            Pull Request: ${{ github.event.pull_request.html_url || 'N/A' }}
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}          
-        
+            [Details](${{ github.server_url }}/{{ github.repository }}/actions/runs/${{ github.run_id }}). 
+            Commit URL: ${{ github.event.head_commit.url }}
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}        
 
   tag_release:
     # Check out the code and bump the version tag
@@ -101,5 +103,5 @@ jobs:
         message: |
           Build succesful.
           Version Tag: ${{ steps.tag_version.outputs.new_tag }}  
-          Commit URL:** ${{ github.event.head_commit.url }}
+          Commit URL: ${{ github.event.head_commit.url }}
         webhook_url: ${{ secrets.DISCORD_WEBHOOK }}

@@ -85,6 +85,7 @@ jobs:
         ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
         fetch-depth: '0'      
     - name: Bump version and push tag
+      id: tag_version
       uses: anothrNick/github-tag-action@1.64.0
       with: 
         default_bump: 'minor'
@@ -99,6 +100,6 @@ jobs:
         title: Build succesful
         message: |
           Build succesful.
-          Pull Request: ${{ github.event.pull_request.html_url || 'N/A' }}
-          Version Tag: ${{ github.ref_name }}   
+          Version Tag: ${{ steps.tag_version.outputs.new_tag }}  
+          Commit URL:** ${{ github.event.head_commit.url }}
         webhook_url: ${{ secrets.DISCORD_WEBHOOK }}

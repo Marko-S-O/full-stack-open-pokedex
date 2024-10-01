@@ -4,9 +4,9 @@ on:
   schedule:
     - cron: '0 0 * * *'  
   workflow_dispatch:
-  
+
 jobs:
-  health check:    
+  health_check:    
     runs-on: ubuntu-latest
     steps:         
       - uses: jtalk/url-health-check-action@v4     

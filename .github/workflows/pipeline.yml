@@ -97,8 +97,5 @@ jobs:
       if: ${{ success() }}
       with:
         severity: info
-        details: |
-          Build succesful.
-          Pull Request: ${{ github.event.pull_request.html_url || 'N/A' }}
-          Version Tag: ${{ github.ref_name }}          
+        details: Build succesful.
         webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
